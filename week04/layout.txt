@@ -1,0 +1,13 @@
+myapp/
+ +-- config.py
+ +-- instance/
+|    +-- config.py
+ +-- myapp/
+|    +-- __init__.py
+|    +-- forms.py
+|    +-- models.py
+|    +-- static/
+|    +-- templates/
+|    +-- views.py
+ +-- requirements.txt
+ +-- run.py
