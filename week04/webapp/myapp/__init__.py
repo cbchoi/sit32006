@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask
 #from . import views
 
@@ -39,3 +40,5 @@ def userid(id, password):
 		return html_line
 	else:
 		return '<h1> Page Not Found </h1>'	
+=======
+>>>>>>> d93dd5c0edd40ee35809e6dc627e2a4ea5558d73
