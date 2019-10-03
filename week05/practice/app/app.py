@@ -2,8 +2,14 @@
 after
 '''
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField 
+from flask_wtf.file import FileField
+
+from wtforms import StringField, SubmitField
 from wtforms.validators import Required
+from werkzeug import secure_filename
+
+import os
+
 '''
 after
 '''
@@ -14,6 +20,7 @@ app = Flask(__name__)
 
 ######
 app.config['SECRET_KEY'] = 'hard to guess string'
+app.config['UPLOAD_FOLDER'] = './static'
 ######
 
 bootstrap = Bootstrap(app) 
@@ -22,12 +29,20 @@ bootstrap = Bootstrap(app)
 class NameForm(FlaskForm):    
     name = StringField('What is your name?', validators=[Required()])    
     submit = SubmitField('Submit') 
+    fileName = FileField('File Name:')
 ######
 
 @app.route('/', methods=['GET', 'POST']) 
 def index():
     form = NameForm()
     if form.validate_on_submit():
+        if form.fileName.data:        
+            f = form.fileName.data
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(
+                app.config['UPLOAD_FOLDER'], filename
+            ))
+        
         old_name = session.get('name')
         if old_name is not None and old_name != form.name.data:
             flash('Looks like you have changed your name!')
