@@ -46,6 +46,7 @@ def edit_profile():
 	form = EditProfileForm()
 	if form.validate_on_submit():
 		current_user.username = form.username.data	
+		
 		# db update
 		collection = db.get_collection('users')
 		collection.delete_one({'id':current_user.id})
@@ -70,9 +71,10 @@ def edit_profile_admin(id):
 			user.id = form.id.data
 			user.username = form.username.data
 			user.confirmed = form.confirmed.data
-			print(form.role.data)
-			#user.role = Role.query.get(form.role.data)
-			#db.session.add(user)
+			# db update
+			collection = db.get_collection('users')
+			collection.update_one({'id':user.id}, {'$set':{'role_id':form.role.data}})
+			
 			flash('The profile has been updated.')
 			return redirect(url_for('.user', username=user.username))
 		form.id.data = user.id

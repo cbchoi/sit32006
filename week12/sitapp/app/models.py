@@ -14,9 +14,11 @@ from flask_login import AnonymousUserMixin
 class User(UserMixin, object):
 	id = ""
 	username = "cbchoi"
-	role = None
+	role = None # 20191112
 	password_hash = ""
 	confirmed = False
+	member_since = ""
+	last_seen = ""
 
 	def __init__(self, email, username, password):
 		self.id = email
@@ -49,7 +51,7 @@ class User(UserMixin, object):
 		collection = db.get_collection('users')
 		results = collection.find_one({'id':user_id})
 		if results is not None:
-			user = User(results['id'], "", "") #20191112
+			user = User(results['id'], "", "") # 20191112
 			user.from_dict(results)
 			return user
 		else:
@@ -77,7 +79,7 @@ class User(UserMixin, object):
 	###
     # 20191112
 	def can(self, permissions):
-		return self.role is not None and (self.role.permissions & permissions) == permissions
+		return self.role is not None and (self.role.permission & permissions) == permissions
     
 	def is_administrator(self):
 		return self.can(Permission.ADMINISTATOR)
@@ -119,6 +121,7 @@ class AnonymousUser(AnonymousUserMixin):
 class Role(object):
 	name = ""
 	permission = 0
+	default = False
 
 	def __init__(self, name, permission, default=False):
 		Role.name = name
@@ -169,5 +172,5 @@ class Permission:
 	COMMENT = 0x02
 	WRITE_ARTICLES = 0x04
 	MODERATE_COMMENTS = 0x08
-	ADMINISTER = 0x80
+	ADMINISTATOR = 0x80
 ###

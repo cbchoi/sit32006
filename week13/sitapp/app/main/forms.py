@@ -34,8 +34,7 @@ class EditProfileAdminForm(FlaskForm):
 		results = collection.find({ } , { "name": True })
 		
 		lst = [result['name'] for result in results] 
-		print(lst)
-		r_lst = [(num, role) for num, role in enumerate(lst)]
+		r_lst = [(role, role) for role in lst]
 
 		self.role.choices = r_lst
 		self.user = user
