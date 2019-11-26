@@ -4,7 +4,7 @@ from flask import render_template, session, redirect, url_for, flash
 from . import main
 from .forms import NameForm
 
-from ..models import User, Permission
+from ..models import User, Permission, Role
 
 from flask_login import login_user, login_required, logout_user
 from ..decorators import admin_required, permission_required
@@ -36,6 +36,7 @@ def user(username):
 	if results is not None:
 		user = User("", "", "") 
 		user.from_dict(results)
+		#print(user.role.permission)
 		return render_template('user.html', user=user)
 	else:
 		abort(404)
@@ -71,10 +72,17 @@ def edit_profile_admin(id):
 			user.id = form.id.data
 			user.username = form.username.data
 			user.confirmed = form.confirmed.data
+			user.role.role_id = form.role.data
+			user.role.permission = Role.get_role_permission(form.role.data)
+
 			# db update
 			collection = db.get_collection('users')
-			collection.update_one({'id':user.id}, {'$set':{'role_id':form.role.data}})
-			
+			#collection.update_one({'id':user.id}, {'$set':{'role_id':form.role.data}})
+			collection.delete_one({'id':user.id})
+			collection.insert_one(user.to_dict())
+			#print("!")
+			#print(user.to_dict())
+
 			flash('The profile has been updated.')
 			return redirect(url_for('.user', username=user.username))
 		form.id.data = user.id

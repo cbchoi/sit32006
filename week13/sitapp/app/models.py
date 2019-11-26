@@ -81,6 +81,8 @@ class User(UserMixin, object):
 	###
     # 20191112
 	def can(self, permissions):
+		print(self.role)
+		print(self.role.permission)
 		return self.role is not None and (self.role.permission & permissions) == permissions
     
 	def is_administrator(self):
@@ -133,10 +135,28 @@ class AnonymousUser(AnonymousUserMixin):
 	def is_administrator(self):
 		return False
 
+class Permission:
+	FOLLOW = 0x01
+	COMMENT = 0x02
+	WRITE_ARTICLES = 0x04
+	MODERATE_COMMENTS = 0x08
+	ADMINISTATOR = 0x80
+
 class Role(object):
 	name = ""
 	permission = 0
 	default = False
+	Roles = {
+		'User': Permission.FOLLOW |
+				 Permission.COMMENT |
+				 Permission.WRITE_ARTICLES,
+		'Moderator': Permission.FOLLOW |
+					  Permission.COMMENT |
+					  Permission.WRITE_ARTICLES|
+					  Permission.MODERATE_COMMENTS,
+		'Administrator': 0xff
+		}
+
 
 	def __init__(self, name, permission, default=False):
 		Role.name = name
@@ -155,7 +175,6 @@ class Role(object):
 					  Permission.MODERATE_COMMENTS, False),
 		'Administrator': (0xff, False)
 		}
-
 		collection = db.get_collection('roles')
 		for k, v in roles.items():
 			result = collection.find_one({'name':k})
@@ -166,6 +185,9 @@ class Role(object):
 			else:
 				collection.insert_one(role.to_dict())
 				
+	@staticmethod
+	def get_role_permission(role):
+		return Role.Roles[role]
 
 	def to_dict(self):
 		dict_role = {
@@ -181,11 +203,4 @@ class Role(object):
 			self.permission = data['permission']
 			self.default = data['default']
 			
-
-class Permission:
-	FOLLOW = 0x01
-	COMMENT = 0x02
-	WRITE_ARTICLES = 0x04
-	MODERATE_COMMENTS = 0x08
-	ADMINISTATOR = 0x80
 ###
